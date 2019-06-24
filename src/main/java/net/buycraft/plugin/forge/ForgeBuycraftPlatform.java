@@ -10,8 +10,8 @@ import net.buycraft.plugin.execution.placeholder.PlaceholderManager;
 import net.buycraft.plugin.execution.strategy.CommandExecutor;
 import net.buycraft.plugin.platform.PlatformInformation;
 import net.buycraft.plugin.platform.PlatformType;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.versions.forge.ForgeVersion;
 
@@ -51,13 +51,13 @@ public class ForgeBuycraftPlatform implements IBuycraftPlatform {
 
     @Override
     public void dispatchCommand(String command) {
-        plugin.getServer().addScheduledTask(() -> { //Ensure main
+        plugin.scheduleTask(ForgeScheduledTask.Builder.create().withTask(() -> { //Ensure main
             try {
                 plugin.getServer().getCommandManager().getDispatcher().execute(command, plugin.getServer().getCommandSource());
             } catch (CommandSyntaxException e) {
                 log(Level.SEVERE, "Failed to dispatch command \'" + command + "\'", e);
             }
-        });
+        }).build());
     }
 
     @Override
@@ -72,15 +72,15 @@ public class ForgeBuycraftPlatform implements IBuycraftPlatform {
 
     @Override
     public void executeBlocking(Runnable runnable) {
-        plugin.getServer().addScheduledTask(runnable);
+        plugin.scheduleTask(ForgeScheduledTask.Builder.create().withTask(runnable).build());
     }
 
     @Override
     public void executeBlockingLater(Runnable runnable, long l, TimeUnit timeUnit) {
-        plugin.getExecutor().schedule(() -> plugin.getServer().addScheduledTask(runnable), l, timeUnit);
+        plugin.getExecutor().schedule(() -> plugin.scheduleTask(ForgeScheduledTask.Builder.create().withTask(runnable).build()), l, timeUnit);
     }
 
-    private EntityPlayerMP getPlayer(QueuedPlayer player) {
+    private ServerPlayerEntity getPlayer(QueuedPlayer player) {
         if (player.getUuid() != null && plugin.getServer().isServerInOnlineMode()) {
             UUID uuid = UuidUtil.mojangUuidToJavaUuid(player.getUuid());
             return plugin.getServer().getPlayerList().getPlayers()
@@ -102,7 +102,7 @@ public class ForgeBuycraftPlatform implements IBuycraftPlatform {
 
     @Override
     public int getFreeSlots(QueuedPlayer queuedPlayer) {
-        InventoryPlayer inventory = getPlayer(queuedPlayer).inventory;
+        PlayerInventory inventory = getPlayer(queuedPlayer).inventory;
         return (int) (inventory.mainInventory.size() - inventory.mainInventory.stream().filter(stack -> stack == ItemStack.EMPTY).count());
     }
 

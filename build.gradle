@@ -25,7 +25,7 @@ repositories {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20180921-1.13'
+    mappings channel: 'snapshot', version: '20190613-1.14.2'
 
     runs {
         client {
@@ -63,8 +63,8 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.175'
-    shadow 'net.buycraft:buycraftx-plugin-shared:12.0.2'
+    minecraft 'net.minecraftforge:forge:1.14.2-26.0.25'
+    shadow 'net.buycraft:buycraftx-plugin-shared:12.0.4'
 }
 
 version = configurations.getByName("shadow").dependencies.find().version // copy common version

@@ -77,8 +77,6 @@ public class ForgeScheduledTask {
         }
 
         public ForgeScheduledTask build() {
-            if (delay <= -1 && interval <= -1)
-                throw new IllegalStateException("Must either have a delay or an interval");
             ForgeScheduledTask forgeScheduledTask = new ForgeScheduledTask();
             forgeScheduledTask.interval = this.interval;
             forgeScheduledTask.async = this.async;
